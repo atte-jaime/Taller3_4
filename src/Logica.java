@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
+
+import ddf.minim.AudioPlayer;
+import ddf.minim.Minim;
 import processing.core.PApplet;
 import processing.core.PFont;
 import processing.core.PImage;
@@ -20,23 +23,27 @@ public class Logica {
 	private String[] puntajes;
 	private ArrayList<Usuario> usuarios;
 	private LinkedList<Fruta> frutas;
+	private Minim minim;
+	private AudioPlayer fondo;
 
 	public Logica(PApplet app) {
 		this.app = app;
 		fuente = app.createFont("../data/Fuentes/BebasNeue.otf", 32);
 		app.textFont(fuente);
-		app.textAlign(PApplet.LEFT, PApplet.TOP);
 		for (int i = 1; i < 12; i++) {
 			interfaz[i - 1] = app.loadImage("../data/Img/pag_" + i + ".png");
 		}
 		usuarios = new ArrayList<Usuario>();
 		frutas = new LinkedList<Fruta>();
+		minim = new Minim(app);
+		fondo = minim.loadFile("../data/Sonidos/fondo.mp3");
 
 		agregarIniciales();
 		agregarPuntajesIniciales();
 	}
 
 	public void pintar() {
+		sonidoFondo();
 		pantallas();
 	}
 
@@ -53,10 +60,23 @@ public class Logica {
 		if (app.keyCode == PApplet.LEFT && pantalla > 0) {
 			pantalla--;
 		}
+		
+		if((app.keyCode == PApplet.BACKSPACE)){
+			System.out.println("HOLI");
+			reiniciar();
+		}
 
 		interaccion();
 		entradaNombre();
 
+	}
+	
+	public void reiniciar(){
+		nombre="";
+		puntaje=0;
+		pantalla=2;
+		frutas.removeAll(frutas);
+		agregarNuevos();
 	}
 
 	public void interaccion() {
@@ -104,7 +124,6 @@ public class Logica {
 		Fruta primero = frutas.getFirst();
 		Fruta siguiente = frutas.get(1);
 
-		System.out.println(primero.getVel());
 
 		if (primero.getVel() >= 10) {
 			siguiente.setVel(primero.getVel() - 3);
@@ -134,6 +153,7 @@ public class Logica {
 
 		case 2:
 			app.image(interfaz[8], app.width / 2, app.height / 2);
+			app.textAlign(PApplet.LEFT, PApplet.TOP);
 			app.textSize(160);
 			app.fill(0);
 			app.text(nombre, 520, 460);
@@ -170,7 +190,7 @@ public class Logica {
 		primero.pintarCronometro();
 		primero.setEjecutar(true);
 
-		if (frutas.size() < 2) {
+		if (frutas.size() < 3) {
 			agregarNuevos();
 		}
 
@@ -325,6 +345,18 @@ public class Logica {
 
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	public void sonidoFondo(){
+		if ( fondo.position() == fondo.length() )
+		  {
+		    fondo.rewind();
+		    fondo.play();
+		  }
+		  else
+		  {
+		    fondo.play();
 		}
 	}
 }
