@@ -1,26 +1,39 @@
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
-
 import processing.core.PApplet;
+import processing.core.PFont;
 import processing.core.PImage;
 
 public class Logica {
 
 	private PApplet app;
+	private int puntaje;
 	private int pantalla = 0;
+	private String nombre = "";
+	private PFont fuente;
 	private PImage[] interfaz = new PImage[11];
+	private String[] puntajes;
+	private ArrayList<Usuario> usuarios;
 	private LinkedList<Fruta> frutas;
 
 	public Logica(PApplet app) {
 		this.app = app;
-
+		fuente = app.createFont("../data/Fuentes/BebasNeue.otf", 32);
+		app.textFont(fuente);
+		app.textAlign(PApplet.LEFT, PApplet.TOP);
 		for (int i = 1; i < 12; i++) {
-			interfaz[i - 1] = app.loadImage("../data/pag_" + i + ".png");
+			interfaz[i - 1] = app.loadImage("../data/Img/pag_" + i + ".png");
 		}
-
+		usuarios = new ArrayList<Usuario>();
 		frutas = new LinkedList<Fruta>();
 
 		agregarIniciales();
-
+		agregarPuntajesIniciales();
 	}
 
 	public void pintar() {
@@ -29,37 +42,11 @@ public class Logica {
 
 	public void teclas() {
 
-		if (app.key == 'c' && frutas.getFirst() instanceof Carambolo) {
-			definirVel();
-			frutas.removeFirst();
+		if (app.keyCode == PApplet.RIGHT && pantalla < 5 && pantalla != 2) {
+			pantalla++;
 		}
 
-		if (app.key == 'b' && frutas.getFirst() instanceof Banana) {
-			definirVel();
-			frutas.removeFirst();
-		}
-
-		if (app.key == 'z' && frutas.getFirst() instanceof Cereza) {
-			definirVel();
-			frutas.removeFirst();
-		}
-
-		if (app.key == 'm' && frutas.getFirst() instanceof Mora) {
-			definirVel();
-			frutas.removeFirst();
-		}
-
-		if (app.key == 'l' && frutas.getFirst() instanceof Limon) {
-			definirVel();
-			frutas.removeFirst();
-		}
-
-		if (app.key == 's' && frutas.getFirst() instanceof Sandia) {
-			definirVel();
-			frutas.removeFirst();
-		}
-
-		if (app.keyCode == PApplet.RIGHT && pantalla <= 5) {
+		if (pantalla == 2 && app.key == PApplet.ENTER) {
 			pantalla++;
 		}
 
@@ -67,6 +54,50 @@ public class Logica {
 			pantalla--;
 		}
 
+		interaccion();
+		entradaNombre();
+
+	}
+
+	public void interaccion() {
+		if (pantalla == 3) {
+
+			if ((app.key == 'c' | app.key == 'C') && frutas.getFirst() instanceof Carambolo) {
+				definirVel();
+				puntaje += (int) (frutas.getFirst().getAngulo() / 2);
+				frutas.removeFirst();
+			}
+
+			if ((app.key == 'b' | app.key == 'B') && frutas.getFirst() instanceof Banana) {
+				definirVel();
+				puntaje += (int) (frutas.getFirst().getAngulo() / 2);
+				frutas.removeFirst();
+			}
+
+			if ((app.key == 'z' | app.key == 'Z') && frutas.getFirst() instanceof Cereza) {
+				definirVel();
+				puntaje += (int) (frutas.getFirst().getAngulo() / 2);
+				frutas.removeFirst();
+			}
+
+			if ((app.key == 'm' | app.key == 'M') && frutas.getFirst() instanceof Mora) {
+				definirVel();
+				puntaje += (int) (frutas.getFirst().getAngulo() / 2);
+				frutas.removeFirst();
+			}
+
+			if ((app.key == 'l' | app.key == 'L') && frutas.getFirst() instanceof Limon) {
+				definirVel();
+				puntaje += (int) (frutas.getFirst().getAngulo() / 2);
+				frutas.removeFirst();
+			}
+
+			if ((app.key == 's' | app.key == 'S') && frutas.getFirst() instanceof Sandia) {
+				definirVel();
+				puntaje += (int) (frutas.getFirst().getAngulo() / 2);
+				frutas.removeFirst();
+			}
+		}
 	}
 
 	public void definirVel() {
@@ -103,6 +134,9 @@ public class Logica {
 
 		case 2:
 			app.image(interfaz[8], app.width / 2, app.height / 2);
+			app.textSize(160);
+			app.fill(0);
+			app.text(nombre, 520, 460);
 			break;
 
 		case 3:
@@ -111,10 +145,18 @@ public class Logica {
 
 		case 4:
 			app.image(interfaz[9], app.width / 2, app.height / 2);
+			app.textAlign(PApplet.CENTER, PApplet.CENTER);
+			app.fill(255);
+			app.textSize(200);
+			app.text(puntaje, app.width / 2, app.height / 2 - 100);
+			app.textSize(120);
+			app.text("PTS", app.width / 2, app.height / 2 + 100);
+			app.noFill();
 			break;
 
 		case 5:
 			app.image(interfaz[10], app.width / 2, app.height / 2);
+			pintarPuntajes();
 			break;
 
 		}
@@ -131,6 +173,51 @@ public class Logica {
 		if (frutas.size() < 2) {
 			agregarNuevos();
 		}
+
+		if (primero.getAngulo() <= 0) {
+			agregarLista(nombre, puntaje);
+			agregarPuntajeNuevo();
+			pantalla = 4;
+		}
+	}
+
+	public void pintarPuntajes() {
+		Collections.sort(usuarios, new ComparadorPuntaje());
+		for (int i = 0; i < 6; i++) {
+			Usuario temp = usuarios.get(i);
+			int pos = i+1;
+			if (i==0) app.textSize(120);
+			else app.textSize(80);
+			app.fill(0);
+			app.textAlign(PApplet.LEFT, PApplet.CENTER);
+			app.text(pos+"   "+temp.getNombre(), 480, 220 + i * 150);
+			app.text(temp.getPuntaje(), 1200, 220 + i * 150);
+		}
+	}
+
+	public void agregarPuntajesIniciales() {
+		puntajes = app.loadStrings("puntajes.txt");
+
+		for (int i = 0; i < puntajes.length; i++) {
+			Usuario temp = new Usuario(puntajes[i]);
+			usuarios.add(temp);
+		}
+	}
+
+	public void agregarPuntajeNuevo() {
+		String[] nuevo;
+
+		nuevo = app.loadStrings("puntajes.txt");
+		usuarios.add(new Usuario(nuevo[nuevo.length - 1]));
+	}
+
+	public void entradaNombre() {
+
+		if (pantalla == 2 && app.key != PApplet.ENTER && app.key != PApplet.BACKSPACE && app.keyCode != PApplet.RIGHT
+				&& app.keyCode != PApplet.LEFT && app.keyCode != 20 && app.key != ' ') {
+			nombre += app.key;
+		}
+
 	}
 
 	public void agregarNuevos() {
@@ -221,4 +308,23 @@ public class Logica {
 		}
 	}
 
+	public void agregarLista(String nombre, int puntaje) {
+		try {
+			String content = nombre + " " + puntaje;
+
+			File file = new File("puntajes.txt");
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+
+			FileWriter fw = new FileWriter(file, true);
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.newLine();
+			bw.write(content);
+			bw.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }
