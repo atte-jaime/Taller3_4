@@ -10,18 +10,24 @@ public class MainApp extends PApplet{
 	
 	public void settings(){
 		fullScreen();
+		
 	}
 	
 	public void setup(){
 		app = new Logica(this);
+		imageMode(CENTER);
+
 	}
 
 	public void draw(){
-		background(0);
+		background(255);
 		app.pintar();
 	}
 
 	public void keyPressed(){
+		if (exitCalled) {
+			exit();
+		}
 		app.teclas();
 	}
 

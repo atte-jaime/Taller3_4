@@ -4,15 +4,13 @@ import processing.core.PImage;
 public abstract class Fruta extends Thread {
 
 	public PApplet app;
-	// public PImage fruta;
-	public int vel = 33;
+	public PImage fruta;
+	public int vel = 60;
 	public boolean ejecutar;
 
-	public Fruta(PApplet app
-	// ,PImage fruta
-	) {
+	public Fruta(PApplet app, PImage fruta) {
 		this.app = app;
-		// this.fruta = fruta;
+		this.fruta = fruta;
 	}
 
 	public void run() {
@@ -44,11 +42,10 @@ public abstract class Fruta extends Thread {
 		return ejecutar;
 	}
 
-	public void setVel(int vel) {
-		if ((this.vel + vel) > 3) {
-			this.vel += vel;
-		}
+	public abstract float getAngulo();
 
+	public void setVel(int vel) {
+			this.vel = vel;
 	}
 
 	public void setEjecutar(boolean ejecutar) {
