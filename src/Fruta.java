@@ -7,7 +7,7 @@ public abstract class Fruta extends Thread {
 	public PImage fruta;
 	public int vel = 60;
 	public boolean ejecutar;
-
+	
 	public Fruta(PApplet app, PImage fruta) {
 		this.app = app;
 		this.fruta = fruta;
@@ -34,6 +34,7 @@ public abstract class Fruta extends Thread {
 
 	public abstract void pintarCronometro();
 
+
 	public int getVel() {
 		return vel;
 	}
@@ -45,7 +46,7 @@ public abstract class Fruta extends Thread {
 	public abstract float getAngulo();
 
 	public void setVel(int vel) {
-			this.vel = vel;
+		this.vel = vel;
 	}
 
 	public void setEjecutar(boolean ejecutar) {

@@ -25,6 +25,7 @@ public class Logica {
 	private LinkedList<Fruta> frutas;
 	private Minim minim;
 	private AudioPlayer fondo;
+	private boolean sandia = false;
 
 	public Logica(PApplet app) {
 		this.app = app;
@@ -49,7 +50,7 @@ public class Logica {
 
 	public void teclas() {
 
-		if (app.keyCode == PApplet.RIGHT && pantalla < 5 && pantalla != 2) {
+		if (app.keyCode == 9 && pantalla < 5 && pantalla != 2) {
 			pantalla++;
 		}
 
@@ -57,11 +58,11 @@ public class Logica {
 			pantalla++;
 		}
 
-		if (app.keyCode == PApplet.LEFT && pantalla > 0) {
+		if (app.keyCode == 16 && pantalla > 0) {
 			pantalla--;
 		}
-		
-		if((app.keyCode == PApplet.BACKSPACE)){
+
+		if ((app.keyCode == PApplet.BACKSPACE)) {
 			System.out.println("HOLI");
 			reiniciar();
 		}
@@ -70,11 +71,11 @@ public class Logica {
 		entradaNombre();
 
 	}
-	
-	public void reiniciar(){
-		nombre="";
-		puntaje=0;
-		pantalla=2;
+
+	public void reiniciar() {
+		nombre = "";
+		puntaje = 0;
+		pantalla = 2;
 		frutas.removeAll(frutas);
 		agregarNuevos();
 	}
@@ -82,48 +83,54 @@ public class Logica {
 	public void interaccion() {
 		if (pantalla == 3) {
 
-			if ((app.key == 'c' | app.key == 'C') && frutas.getFirst() instanceof Carambolo) {
+			if (app.keyCode == PApplet.LEFT && frutas.getFirst() instanceof Carambolo) {
 				definirVel();
 				puntaje += (int) (frutas.getFirst().getAngulo() / 2);
 				frutas.removeFirst();
 			}
 
-			if ((app.key == 'b' | app.key == 'B') && frutas.getFirst() instanceof Banana) {
+			if (app.keyCode == PApplet.RIGHT && frutas.getFirst() instanceof Banana) {
 				definirVel();
 				puntaje += (int) (frutas.getFirst().getAngulo() / 2);
 				frutas.removeFirst();
 			}
 
-			if ((app.key == 'z' | app.key == 'Z') && frutas.getFirst() instanceof Cereza) {
+			if (app.keyCode == PApplet.UP && frutas.getFirst() instanceof Cereza) {
 				definirVel();
 				puntaje += (int) (frutas.getFirst().getAngulo() / 2);
 				frutas.removeFirst();
 			}
 
-			if ((app.key == 'm' | app.key == 'M') && frutas.getFirst() instanceof Mora) {
+			if (app.keyCode == PApplet.DOWN && frutas.getFirst() instanceof Mora) {
 				definirVel();
 				puntaje += (int) (frutas.getFirst().getAngulo() / 2);
 				frutas.removeFirst();
 			}
 
-			if ((app.key == 'l' | app.key == 'L') && frutas.getFirst() instanceof Limon) {
+			if (app.key == ' ' && frutas.getFirst() instanceof Limon) {
 				definirVel();
 				puntaje += (int) (frutas.getFirst().getAngulo() / 2);
 				frutas.removeFirst();
 			}
+			
 
-			if ((app.key == 's' | app.key == 'S') && frutas.getFirst() instanceof Sandia) {
-				definirVel();
-				puntaje += (int) (frutas.getFirst().getAngulo() / 2);
-				frutas.removeFirst();
-			}
+			
 		}
+	}
+	
+	public void pressed(){
+		
+		if (pantalla==3 && frutas.getFirst() instanceof Sandia) {
+			definirVel();
+			puntaje += (int) (frutas.getFirst().getAngulo() / 2);
+			frutas.removeFirst();
+		}
+		
 	}
 
 	public void definirVel() {
 		Fruta primero = frutas.getFirst();
 		Fruta siguiente = frutas.get(1);
-
 
 		if (primero.getVel() >= 10) {
 			siguiente.setVel(primero.getVel() - 3);
@@ -205,12 +212,14 @@ public class Logica {
 		Collections.sort(usuarios, new ComparadorPuntaje());
 		for (int i = 0; i < 6; i++) {
 			Usuario temp = usuarios.get(i);
-			int pos = i+1;
-			if (i==0) app.textSize(120);
-			else app.textSize(80);
+			int pos = i + 1;
+			if (i == 0)
+				app.textSize(120);
+			else
+				app.textSize(80);
 			app.fill(0);
 			app.textAlign(PApplet.LEFT, PApplet.CENTER);
-			app.text(pos+"   "+temp.getNombre(), 480, 220 + i * 150);
+			app.text(pos + "   " + temp.getNombre(), 480, 220 + i * 150);
 			app.text(temp.getPuntaje(), 1200, 220 + i * 150);
 		}
 	}
@@ -234,7 +243,8 @@ public class Logica {
 	public void entradaNombre() {
 
 		if (pantalla == 2 && app.key != PApplet.ENTER && app.key != PApplet.BACKSPACE && app.keyCode != PApplet.RIGHT
-				&& app.keyCode != PApplet.LEFT && app.keyCode != 20 && app.key != ' ') {
+				&& app.keyCode != PApplet.LEFT && app.keyCode != 20 && app.key != ' ' && app.keyCode != 16
+				&& app.keyCode != 16) {
 			nombre += app.key;
 		}
 
@@ -347,16 +357,13 @@ public class Logica {
 			e.printStackTrace();
 		}
 	}
-	
-	public void sonidoFondo(){
-		if ( fondo.position() == fondo.length() )
-		  {
-		    fondo.rewind();
-		    fondo.play();
-		  }
-		  else
-		  {
-		    fondo.play();
+
+	public void sonidoFondo() {
+		if (fondo.position() == fondo.length()) {
+			fondo.rewind();
+			fondo.play();
+		} else {
+			fondo.play();
 		}
 	}
 }

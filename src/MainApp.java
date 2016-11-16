@@ -30,5 +30,9 @@ public class MainApp extends PApplet{
 		}
 		app.teclas();
 	}
+	
+	public void mousePressed(){
+		app.pressed();
+	}
 
 }
